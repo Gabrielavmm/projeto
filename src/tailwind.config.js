@@ -11,7 +11,9 @@ module.exports = {
         "custom-bg": "#F6F6F6", 
         "custom-dark": "#2F2F2F", 
         "custom-green": "#22C55E",
-        "custom-gray": "#717171"
+        "custom-gray": "#717171",
+        "custom-ligth" : "#FFFFFF",
+       
       },
       fontFamily: {
         sans: ['Roboto', 'sans-serif'], 

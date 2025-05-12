@@ -16,9 +16,11 @@ export function Login() {
     e.preventDefault();
     try {
       await login(email, password);
-      navigate('/dashbord');
+      
+      navigate('/admin');
     } catch (error) {
       const firebaseError = error as FirebaseError; 
+      
       toast.error(firebaseError.message); 
       
       if (firebaseError.code === 'auth/wrong-password') {
@@ -41,14 +43,14 @@ export function Login() {
       <form onSubmit={handleSubmit}>
        
         <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '16px', width: '84%' }}>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '16px', width: '30%' }}>
           Email:   </label>
         <input
           value={email}
           id="email"
           onChange={(e) => setEmail(e.target.value)}
           type="email"
-          className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '18%'}}
+          className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '78%'}}
           placeholder=" Ex: seu@email.com"
           required
         />
@@ -56,7 +58,7 @@ export function Login() {
       
      
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:'17px', fontSize: '16px', width: '84%' }}>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:'17px', fontSize: '16px', width: '30%' }}>
           Senha:
         </label>
         <input
@@ -64,7 +66,7 @@ export function Login() {
           id="password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '18%'}}
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '78%'}}
           placeholder=" ********"
           required
         />
@@ -73,17 +75,17 @@ export function Login() {
         <button
           type='submit'
           onClick={handleSubmit}
-          style={{marginTop: '22px', height: '35px', width:'19%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '12px', fontWeight: 'semi-bold'}}
+          style={{marginTop: '22px', height: '35px', width:'78%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '12px', fontWeight: 'semi-bold'}}
          >ENTRAR</button>
-          <fieldset style ={{marginTop:'442px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+          <fieldset style ={{marginTop:'245px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
 
       </form>
    
    
    
-   <div style={{marginTop: '12px', fontSize: '18px'}}>
+   <div style={{marginTop: '10px', fontSize: '15px'}}>
     <span className="text-gray-600">Não tem conta? </span>
-      <Link to="/Register" className='text-custom-green'>Registrar</Link>
+      <Link to="/register" className='text-custom-green'>Registrar</Link>
       <br/>
       <Link to="/forgot-password"  style={{color:'#717171'}}>Esqueci a senha</Link>
    </div>
