@@ -1,7 +1,7 @@
-import { getAuth, updateEmail, updatePassword } from "firebase/auth";
+import { getAuth, sendEmailVerification, updateEmail, updatePassword } from "firebase/auth";
 import { doc, getDoc, updateDoc} from "firebase/firestore";
 import { get } from "http";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
@@ -19,9 +19,12 @@ export function EditarPerfil() {
     newpassword: "",
     senhaAtual: "",
   });
+  
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+ 
+
 
   const auth = getAuth();
   const navigate = useNavigate();
@@ -67,7 +70,7 @@ export function EditarPerfil() {
     // Adiciona um pequeno delay para garantir que o auth esteja pronto
     const timer = setTimeout(() => {
       fetchUserData();
-    }, 300);
+    }, 400);
 
     return () => clearTimeout(timer);
   }, [user, navigate]);
@@ -86,17 +89,9 @@ export function EditarPerfil() {
     setUpdating(true);
     
     try {
-      // 1. Atualização dos dados no Firestore
-      const userRef = doc(db, "users", user!.uid);
-      await updateDoc(userRef, {
-        name: userData.name,
-        cnpj: userData.cnpj,
-        email: userData.email 
-      });
-  
-      // 2. Verificação de alterações sensíveis
+      // 1. Verificação de alterações sensíveis
       const emailChanged = user!.email !== userData.email;
-      const passwordChanged = !!userData.senhaAtual
+      const passwordChanged = !!userData.newpassword;
   
       if (emailChanged || passwordChanged) {
         if (!userData.senhaAtual) {
@@ -104,7 +99,7 @@ export function EditarPerfil() {
           return;
         }
   
-        // 3. Reautenticação
+        // 2. Reautenticação
         const credential = EmailAuthProvider.credential(
           user!.email!, 
           userData.senhaAtual
@@ -112,20 +107,53 @@ export function EditarPerfil() {
         
         await reauthenticateWithCredential(user!, credential);
   
-        // 4. Atualizações sensíveis
+        // 3. Atualizações sensíveis (Authentication primeiro)
         if (emailChanged) {
-          await updateEmail(user!, userData.email);
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email)) {
+            toast.error('Por favor, insira um email válido');
+            return;
+          }
+          
+          try {
+            // Primeiro envia email de verificação para o NOVO email
+            await sendEmailVerification(user!);
+            toast.success('Email de verificação enviado. Por favor, verifique seu novo email antes de continuar.');
+            
+            // Atualiza o email no Firestore (mas não no Authentication ainda)
+            const userRef = doc(db, "users", user!.uid);
+            await updateDoc(userRef, {
+              name: userData.name,
+              cnpj: userData.cnpj,
+              email: userData.email,
+              emailVerified: false // Marca como não verificado
+            });
+  
+            // Não atualiza o email no Authentication ainda
+            toast('Por favor, verifique seu novo email e depois tente novamente');
+            return;
+          } catch (error) {
+            console.error("Falha ao enviar email de verificação:", error);
+            throw error;
+          }
         }
   
         if (passwordChanged) {
           await updatePassword(user!, userData.newpassword);
+          toast.success('Senha atualizada com sucesso!');
         }
       }
   
-      toast.success('Perfil atualizado com sucesso!');
-      navigate('/admin');
+      // 4. Se não houve mudança de email, atualiza outros dados
+      if (!emailChanged) {
+        const userRef = doc(db, "users", user!.uid);
+        await updateDoc(userRef, {
+          name: userData.name,
+          cnpj: userData.cnpj
+        });
+        toast.success('Perfil atualizado com sucesso!');
+        navigate('/admin');
+      }
     } catch (error) {
-      // 5. Tratamento de erros
       console.error(error);
       
       if (error instanceof FirebaseError) {
@@ -139,6 +167,15 @@ export function EditarPerfil() {
           case 'auth/wrong-password':
             toast.error('Senha atual incorreta');
             break;
+          case 'auth/email-already-in-use':
+            toast.error('Este email já está em uso por outra conta');
+            break;
+          case 'auth/invalid-email':
+            toast.error('O email fornecido é inválido');
+            break;
+          case 'auth/operation-not-allowed':
+            toast.error('Verifique seu novo email antes de alterar');
+            break;
           default:
             toast.error(`Erro ao atualizar: ${error.message}`);
         }
@@ -149,7 +186,7 @@ export function EditarPerfil() {
       setUpdating(false);
     }
   };
-
+  
 
 
   if (loading) {
@@ -203,8 +240,8 @@ export function EditarPerfil() {
         </div>
         <div>
         {/* Email */}
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '13px', width: '23%' }}>
-          Email:   </label>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '13px', width: '24%' }}>
+          Email:</label>
         <input
           id="email"
           type="email"
@@ -213,6 +250,8 @@ export function EditarPerfil() {
           className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%'}}
           required
         />
+
+        
         </div>
         <div>
         {/* Senha Atual */}
@@ -222,7 +261,7 @@ export function EditarPerfil() {
         <input
           id="senhaAtual"
           type="password"
-          placeholder="Obrigátoria para alterar senha"
+          placeholder="Obrigátoria para alterar senha e/ou email"
 
           value={userData.senhaAtual}
           onChange={(e) => setUserData({...userData, senhaAtual: e.target.value})}
@@ -246,7 +285,7 @@ export function EditarPerfil() {
           required
         />
         </div>
-        <fieldset style ={{marginTop:'240px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+        <fieldset style ={{marginTop:'200px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
         <button 
           onClick={handleUpdate}
           disabled={updating}

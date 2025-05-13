@@ -14,18 +14,32 @@ export function Login() {
 
  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    toast.dismiss();
+
+    if (!email) {
+      toast.error('insira o email');
+      return;
+    }
+    if (!password) {
+      toast.error('insira a senha');
+      return;
+    }
+    
     try {
       await login(email, password);
       
       navigate('/admin');
     } catch (error) {
+      toast.dismiss();
       const firebaseError = error as FirebaseError; 
       
-      toast.error(firebaseError.message); 
+      const errorMessage = firebaseError.message.toLowerCase();
+      if (errorMessage.includes('invalid-credential')) {
+      toast.error('usuario e/ou senha inválidos');
+    } else {
+      toast.error('Erro ao fazer login: ' + firebaseError.message);
+    }
       
-      if (firebaseError.code === 'auth/wrong-password') {
-        toast.error('Senha incorreta');
-      }
     }
   };
 
@@ -44,7 +58,7 @@ export function Login() {
        
         <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '16px', width: '30%' }}>
-          Email:   </label>
+          Email  </label>
         <input
           value={email}
           id="email"
@@ -52,9 +66,13 @@ export function Login() {
           type="email"
           className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '78%'}}
           placeholder=" Ex: seu@email.com"
-          required
+          
         />
+       
+          
+
       </div>
+
       
      
       <div>
@@ -68,20 +86,20 @@ export function Login() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '78%'}}
           placeholder=" ********"
-          required
+          
         />
         </div>
       
         <button
           type='submit'
-          onClick={handleSubmit}
+          
           style={{marginTop: '22px', height: '35px', width:'78%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '12px', fontWeight: 'semi-bold'}}
          >ENTRAR</button>
-          <fieldset style ={{marginTop:'245px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+          <fieldset style ={{marginTop:'370px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
 
       </form>
    
-   
+    
    
    <div style={{marginTop: '10px', fontSize: '15px'}}>
     <span className="text-gray-600">Não tem conta? </span>

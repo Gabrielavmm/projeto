@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { Login } from '../Features/auth/Login';
 import { Registro } from '../Features/auth/Registro';
 import { Navigate } from 'react-router-dom';
@@ -14,8 +15,10 @@ import '../my-app/app/globals.css';
 
 function App() {
   return (
+   
     <AuthProvider>
     <BrowserRouter>
+    <Toaster /> 
      
       
 
@@ -31,6 +34,7 @@ function App() {
       </Routes>
     </BrowserRouter>
     </AuthProvider>
+    
   );
 }
 
