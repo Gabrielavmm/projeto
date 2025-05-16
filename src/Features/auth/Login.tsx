@@ -103,7 +103,7 @@ export function Login() {
    
    <div style={{marginTop: '10px', fontSize: '15px'}}>
     <span className="text-gray-600">Não tem conta? </span>
-      <Link to="/register" className='text-custom-green'>Registrar</Link>
+      <Link to="/opcao" className='text-custom-green'>Registrar</Link>
       <br/>
       <Link to="/forgot-password"  style={{color:'#717171'}}>Esqueci a senha</Link>
    </div>
