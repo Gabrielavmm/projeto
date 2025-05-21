@@ -1,17 +1,14 @@
-import { getAuth, sendEmailVerification, updateEmail, updatePassword } from "firebase/auth";
-import { doc, getDoc, updateDoc} from "firebase/firestore";
-import { get } from "http";
-import { useRef, useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import HeaderFuncionario from "../../components/HeaderFuncionario";
+import { EmailAuthProvider, getAuth, reauthenticateWithCredential, sendEmailVerification, updatePassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { db } from "../../firebase";
-import Header from '../../components/Header';
-
-import { reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import toast from "react-hot-toast";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 import { FirebaseError } from "firebase/app";
 
-export function EditarPerfil() {
+
+export function EditarperfilFuncionario() {
   const [userData, setUserData] = useState({
     name: "",
     cnpj: "",
@@ -83,7 +80,6 @@ export function EditarPerfil() {
     );
   }
 
-
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setUpdating(true);
@@ -151,7 +147,7 @@ export function EditarPerfil() {
           cnpj: userData.cnpj
         });
         toast.success('Perfil atualizado com sucesso!');
-        navigate('/admin');
+        navigate('/funcionario');
       }
     } catch (error) {
       console.error(error);
@@ -196,19 +192,32 @@ export function EditarPerfil() {
       </div>
     );
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   
-
-
-
-
-
-
   return (
-    <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
-           
-            <Header />
+    
+      <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
+        <HeaderFuncionario />
 
-            {loading ? (
+        {loading ? (
             <p>Carregando dados do perfil...</p>
           ) : (
         <div className="relative">
@@ -225,7 +234,7 @@ export function EditarPerfil() {
           style={{height: '30px', width: '81%'}}
           required
         />
-         <div>
+        <div>
         {/* CNPJ */}
         <label htmlFor="cnpj" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px', marginTop:' 17px', fontSize: '13px', width: '54%' }}>
           CNPJ da empresa vinculada:</label>
@@ -300,7 +309,7 @@ export function EditarPerfil() {
             Editar
           </button>
           <button
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate('/empresa')}
           style={{marginTop: '10px', height: '35px', width:'85%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
             Voltar</button>
                 

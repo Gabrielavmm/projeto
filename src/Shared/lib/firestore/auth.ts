@@ -33,26 +33,24 @@ export const login = async (email: string, password: string) => {
 };
 
 
-export const register = async (email: string, password: string,  userData: any) => {
+export const register = async (
+  email: string,
+  password: string,
+  userData: any,
+  role: string // Adicione este novo parâmetro
+) => {
   try {
-    
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    
-    
 
     await setDoc(doc(db, "users", userCredential.user.uid), {
       name: userData.name,
-      cnpj: userData.cnpj,
+      cnpj: userData.cnpj || null, // CNPJ opcional
       email: email,
+      role: role, // Use o role passado como parâmetro
       createdAt: new Date()
-    }).then(() => {
-      console.log("Documento criado com ID: ", userCredential.user.uid);
-    }).catch((error) => {
-      console.error("Erro ao salvar no Firestore: ", error);
     });
     
-    return userCredential.user;
-
+    return userCredential;
   } catch (error) {
     let errorMessage = "Falha no cadastro";
     

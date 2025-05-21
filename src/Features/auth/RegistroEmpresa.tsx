@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../Shared/lib/firestore/auth";
+import toast from "react-hot-toast";
 
 export function RegistroEmpresa() {
   const [name, setName] = useState('');
   const [cnpj, setCnpj] = useState('');
-  //const [endereco, setEndereco] = useState('');
+ 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -15,12 +16,8 @@ export function RegistroEmpresa() {
     e.preventDefault();
     
     try {
-      await register(email, password, {
-        name,
-        cnpj,
-        //endereco,
-        email
-      });
+      await register(email, password, { name, cnpj }, "empresa");
+      toast.success('Usuário criado com sucesso');
       navigate('/empresa');
     } catch (error) {
       console.error('Erro ao registrar empresa:', error);

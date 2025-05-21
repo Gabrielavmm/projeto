@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../Shared/lib/firestore/auth';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 export function Registro(){
     const [name, setName] = useState('');
@@ -18,11 +20,7 @@ export function Registro(){
       e.preventDefault();
       
       try {
-        await register(email, password, {
-          name,
-          cnpj,
-          email
-        });
+        await register(email, password, { name, cnpj, email }, "admin");
         
         toast.success('Usuário criado com sucesso');
         navigate('/admin');

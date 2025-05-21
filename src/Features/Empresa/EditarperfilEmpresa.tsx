@@ -15,7 +15,7 @@ export function EditarperfilEmpresa() {
     newpassword: "",
     senhaAtual: "",
   });
-  
+  const [toastShown, setToastShown] = useState(false);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
@@ -241,8 +241,15 @@ export function EditarperfilEmpresa() {
             id="cnpj"
             type="text"
             value={userData.cnpj}
-            onChange={(e) => setUserData({...userData, cnpj: e.target.value})}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%'}}
+            readOnly
+            onClick={() => {
+                if (!toastShown) {
+                  toast.error("CNPJ não pode ser editado");
+                  setToastShown(true);
+                  setTimeout(() => setToastShown(false), 1000); 
+                }
+              }}
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%', cursor: 'not-allowed', backgroundColor: '#E2E8F0'}}
             required
         />
         </div>

@@ -32,7 +32,7 @@ export function Opcao(){
                 borderRadius: '8px', marginTop: '5px'  }}>Empresa</button>
 
         <button
-        onClick={() => navigate('/RegistroFuncionario')}
+        onClick={() => navigate('/registro-funcionario')}
         style={{ fontSize: '15px',  height: '120px', width: '30%', backgroundColor: "#FFFFFF",  color:'#2F2F2F', 
                   border: '1px solid #E2E8F0', 
                 borderRadius: '8px', marginTop: '5px'  }}>Funcionário</button>

@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebase';
 
 import { login } from '../../Shared/lib/firestore/auth';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FirebaseError } from 'firebase/app';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 
 export function Login() {
@@ -26,9 +29,34 @@ export function Login() {
     }
     
     try {
-      await login(email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // 2. Busca os dados do usuário no Firestore
+        const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+        
+        if (!userDoc.exists()) {
+            throw new Error("Perfil de usuário não encontrado");
+        }
+
+        const userData = userDoc.data();
+        
+        // 3. Redireciona baseado no role
+        switch(userData.role) {
+            case 'admin':
+                navigate('/admin');
+                break;
+            case 'empresa':
+                navigate('/empresa');
+                break;
+            case 'funcionario':
+                navigate('/funcionario');
+                break;
+        }
       
-      navigate('/admin');
+
+     
+      
+     
     } catch (error) {
       toast.dismiss();
       const firebaseError = error as FirebaseError; 
