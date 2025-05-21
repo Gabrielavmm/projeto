@@ -6,9 +6,12 @@ import { RegistroEmpresa } from '../Features/auth/RegistroEmpresa';
 import { RegistroFuncionario } from '../Features/auth/RegistroFuncionario';
 import { Navigate } from 'react-router-dom';
 import { HomeAdmin } from '../Features/adimin/HomeAdmin';
+import { HomeEmpresa } from '../Features/Empresa/HomeEmpresa';
 import { Indicadores } from '../Features/adimin/Indicadores';
 import { ControleFuncionarios } from '../Features/adimin/ControleFuncionarios';
 import { EditarPerfil } from '../Features/adimin/EditarPerfil';
+import { EditarperfilEmpresa } from '../Features/Empresa/EditarperfilEmpresa';
+import { ControleFuncionariosEmpresa } from '../Features/Empresa/ControlefuncionariosEmpresa';
 import { Opcao } from '../Features/home/OpcaoRegistro';
 import { ResetPassword } from '../Features/auth/ResetPassword';
 import './App.css'; // Mantenha se precisar de estilos globais
@@ -34,9 +37,12 @@ function App() {
         <Route path="/register" element={<Registro />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="/admin" element={<HomeAdmin />} />
+        <Route path="/empresa" element={<HomeEmpresa />} />
         <Route path="indicadores" element={<Indicadores />} />
         <Route path="controle-funcionarios" element={<ControleFuncionarios />} />
         <Route path="/editar-perfil" element={<EditarPerfil />} />
+        <Route path="/editar-perfil-empresa" element={<EditarperfilEmpresa />} />
+        <Route path="/controle-funcionarios-empresa" element={<ControleFuncionariosEmpresa />} />
       </Routes>
     </BrowserRouter>
     </AuthProvider>

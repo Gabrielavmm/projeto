@@ -1,8 +1,11 @@
+import HeaderEmpresa from "../../components/HeaderEmpresa";
+
+
 export function HomeEmpresa() {
     return (
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Página Inicial da Empresa</h2>
-        {/* Conteúdo da página inicial da empresa */}
+      <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
+      <HeaderEmpresa />
       </div>
+      
     );
   }
