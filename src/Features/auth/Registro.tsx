@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../Shared/lib/firestore/auth';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { doc, setDoc } from 'firebase/firestore';
+import { arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 export function Registro(){
@@ -13,19 +13,41 @@ export function Registro(){
     const [cnpj, setCnpj] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     
     const navigate = useNavigate();
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
       e.preventDefault();
+      setLoading(true);
+      toast.dismiss();
       
       try {
-        await register(email, password, { name, cnpj, email }, "admin");
-        
-        toast.success('Usuário criado com sucesso');
+        const cnpjNumerico = cnpj.replace(/\D/g, '');
+        const empresaRef = doc(db, "empresas", cnpj.replace(/\D/g, ''));
+        const empresaSnap = await getDoc(empresaRef);
+      
+      
+      if (!empresaSnap.exists()) {
+        throw new Error("CNPJ não cadastrado como empresa");
+      }
+
+      const userCredential = await register(email, password, { 
+        name, 
+        cnpj: cnpjNumerico 
+      }, "admin");
+  
+      await updateDoc(empresaRef, {
+        administradores: arrayUnion(userCredential.user.uid) // ← Usa UID, não email
+      });
+      toast.success('Usuário criado com sucesso');
         navigate('/admin');
       } catch (error) {
-        toast.error('Erro ao criar usuário');
+        if ((error as Error).message.includes("CNPJ não cadastrado")) {
+          toast.error("CNPJ não cadastrado como empresa");
+        } else {
+          toast.error('Erro ao criar usuário');
+        }
         console.error(error);
       }
 

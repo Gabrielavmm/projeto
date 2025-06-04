@@ -5,6 +5,7 @@ import { Registro } from '../Features/auth/Registro';
 import { RegistroEmpresa } from '../Features/auth/RegistroEmpresa';
 import { RegistroFuncionario } from '../Features/auth/RegistroFuncionario';
 import { Grafico } from '../Features/Funcionarios/Grafico';
+import { PaginadeEspera } from '../Features/home/PaginadeEspera';
 
 import { Navigate } from 'react-router-dom';
 import { HomeAdmin } from '../Features/adimin/HomeAdmin';
@@ -37,6 +38,7 @@ function App() {
         <Route path="/opcao" element={<Opcao />} />
         <Route path="/registro-empresa" element={<RegistroEmpresa />} />
         <Route path="/registro-funcionario" element={<RegistroFuncionario />} />
+        <Route path="/paginadeespera" element={<PaginadeEspera />} />
         
         <Route path="/register" element={<Registro />} />
         <Route path="/forgot-password" element={<ResetPassword />} />

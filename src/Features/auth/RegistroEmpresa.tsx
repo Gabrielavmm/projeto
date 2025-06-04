@@ -9,19 +9,37 @@ export function RegistroEmpresa() {
  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
+    setLoading(true);
+    toast.dismiss();
+
+    // Validação básica do CNPJ (14 dígitos numéricos)
+    const cnpjNumerico = cnpj.replace(/\D/g, '');
+    if (cnpjNumerico.length !== 14) {
+      toast.error('CNPJ deve conter 14 dígitos');
+      setLoading(false);
+      return;
+    }
     
     try {
-      await register(email, password, { name, cnpj }, "empresa");
-      toast.success('Usuário criado com sucesso');
+      await register(email, password, { name, cnpj: cnpjNumerico 
+    }, "empresa"); 
+      toast.success('Empresa cadastrada com sucesso');
       navigate('/empresa');
     } catch (error) {
-      console.error('Erro ao registrar empresa:', error);
+      if ((error as Error).message.includes("CNPJ já cadastrado")) {
+        toast.error("Este CNPJ já possui cadastro");
+      } else {
+        toast.error((error as Error).message);
+      }
     }
+
+    
   }
 
 
@@ -64,6 +82,7 @@ export function RegistroEmpresa() {
             value={cnpj}
             id="cnpj"
             type="text"
+            
             onChange={(e) => setCnpj(e.target.value)}
             className=" w-full p-4 text-base bg-gray-100 rounded-lg border-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%', marginBottom:'7px'}}
             placeholder=" Ex: 12.345.678/0001-90 "
