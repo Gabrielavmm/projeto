@@ -2,9 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../Shared/lib/firestore/auth";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { arrayUnion, collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { auth, db } from "../../firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+
+
 
 export function RegistroFuncionario() {
     const [name, setName] = useState('');
@@ -19,50 +18,22 @@ export function RegistroFuncionario() {
       e.preventDefault();
       setLoading(true);
       toast.dismiss();
-      
-      try {
-        const cnpjNumerico = cnpj.replace(/\D/g, '');
-        const empresaRef = doc(db, "empresas", cnpj.replace(/\D/g, ''));
-        const empresaSnap = await getDoc(empresaRef);
-      
-      
-      if (!empresaSnap.exists()) {
-        throw new Error("Empresa não encontrada");
+      try{   
+      await register(email, password, { 
+        name, 
+        cnpj: cnpj 
+      }, "funcionario");
+      toast.success('Usuário criado com sucesso');
+      navigate('/funcionario');
+    } catch (error) {
+      if ((error as Error).message.includes("CNPJ não cadastrado")) {
+        toast.error("CNPJ não cadastrado como empresa");
+      } else {
+        toast.error("Erro ao criar usuário: " + (error as Error).message);
       }
-
-      
-        // 2. Registra o funcionário
-        const userCredential = await register(email, password, { 
-          name, 
-          cnpj: cnpjNumerico 
-        }, "funcionario");
-
-        await signInWithEmailAndPassword(auth, email, password);
-
-      
-        console.log("Funcionário registrado, UID:", userCredential.user.uid);
-      
-        // 3. Atualiza a empresa
-        await updateDoc(empresaRef, {
-          usuarios: arrayUnion(userCredential.user.uid)
-        });
+      console.error(error);
+    }
     
-        toast.success('Cadastro realizado com sucesso!');
-        navigate('/funcionario');
-         
-      } catch (error: any) {
-        console.error("Erro detalhado:", error);
-        
-        if (error.code === 'permission-denied') {
-          toast.error('Permissão negada. Contate o administrador.');
-        } else if (error.message.includes("Empresa não encontrada")) {
-          toast.error(error.message);
-        } else {
-          toast.error('Falha no cadastro: ' + error.message);
-        }
-      } finally {
-        setLoading(false);
-      }
 
     }
     

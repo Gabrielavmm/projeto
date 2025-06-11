@@ -1,8 +1,9 @@
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail} from "firebase/auth";
 import app from "./core";
-import { arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, or, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firestore";
 import { FirebaseError } from "firebase/app";
+import toast from "react-hot-toast";
 
 
 export const auth = getAuth(app);
@@ -41,8 +42,6 @@ export const register = async (email: string, password: string, userData: any, r
     console.log("UID criado:", userCredential.user.uid)
     const cnpjNumerico = userData.cnpj.replace(/\D/g, '');
 
-   
-
     
     if (role === 'empresa') {
       const cnpjDoc = await getDoc(doc(db, "empresas", cnpjNumerico));
@@ -56,6 +55,22 @@ export const register = async (email: string, password: string, userData: any, r
       });
     }
 
+    if( role === 'admin' || role === 'funcionario') {
+      
+        const cnpjNumerico = userData.cnpj.replace(/\D/g, '');
+        const empresaRef = doc(db, "empresas", cnpjNumerico);
+        const empresaSnap = await getDoc(empresaRef);
+      
+      
+      if (!empresaSnap.exists()) {
+        throw new Error("CNPJ não cadastrado como empresa");
+      }
+      
+    
+    }
+
+
+
     await setDoc(doc(db, "users", userCredential.user.uid), {
       name: userData.name,
       cnpj: cnpjNumerico,
@@ -64,13 +79,6 @@ export const register = async (email: string, password: string, userData: any, r
       createdAt: new Date(),
       
     });
-
-    if (role !== 'empresa') {
-      const empresaRef = doc(db, "empresas", cnpjNumerico);
-      await updateDoc(empresaRef, {
-        usuarios: arrayUnion(userCredential.user.uid)
-      });
-    }
 
     return userCredential;
   } catch (error) {

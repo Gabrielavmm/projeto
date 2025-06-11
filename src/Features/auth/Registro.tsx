@@ -1,12 +1,9 @@
 import React from 'react';
-import { FiUser } from "react-icons/fi";
 import { Link, useNavigate } from 'react-router-dom';
-
 import { register } from '../../Shared/lib/firestore/auth';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
+
 
 export function Registro(){
     const [name, setName] = useState('');
@@ -21,32 +18,20 @@ export function Registro(){
       e.preventDefault();
       setLoading(true);
       toast.dismiss();
-      
-      try {
-        const cnpjNumerico = cnpj.replace(/\D/g, '');
-        const empresaRef = doc(db, "empresas", cnpj.replace(/\D/g, ''));
-        const empresaSnap = await getDoc(empresaRef);
-      
-      
-      if (!empresaSnap.exists()) {
-        throw new Error("CNPJ não cadastrado como empresa");
-      }
-
-      const userCredential = await register(email, password, { 
+     try{
+      await register(email, password, { 
         name, 
-        cnpj: cnpjNumerico 
+        cnpj: cnpj 
       }, "admin");
   
-      await updateDoc(empresaRef, {
-        administradores: arrayUnion(userCredential.user.uid) // ← Usa UID, não email
-      });
       toast.success('Usuário criado com sucesso');
-        navigate('/admin');
+      navigate('/admin');
+    
       } catch (error) {
         if ((error as Error).message.includes("CNPJ não cadastrado")) {
           toast.error("CNPJ não cadastrado como empresa");
         } else {
-          toast.error('Erro ao criar usuário');
+          toast.error("Erro ao criar usuário: " + (error as Error).message);
         }
         console.error(error);
       }
@@ -54,7 +39,7 @@ export function Registro(){
     }
     
     return(
-        <div className=" flex flex-col justify-center px-4 bg-custom-bg" style={{textAlign:'center', minHeight: '100vh'}}>
+        <div className="flex flex-col justify-center px-4 bg-custom-bg text-center" style={{textAlign:'center', minHeight: '100vh'}}>
         <h1 className=' font-sans' style={{fontSize:'60px', lineHeight: '110px', marginBottom: '15px'}}>
             <span className="text-custom-dark" style={{fontWeight:'30'}} >Data</span>
             <span className="text-custom-green" >Baker</span>
@@ -146,7 +131,6 @@ export function Registro(){
         
     )
 
-    
- 
+  
 
 }

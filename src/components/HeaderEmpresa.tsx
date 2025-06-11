@@ -125,7 +125,7 @@ const HeaderEmpresa = () => {
              fontSize: '15px',
                 fontWeight: 'regular',
                 width: '53%' , marginTop: '15px'
-            }} onClick={() => navigate('/controle-funcionarios-empresa')} >Funcionários</li>
+            }} onClick={() => navigate('/empresa')} >Funcionários</li>
             <li style={{
                 fontSize: '15px',
                 fontWeight: 'regular',
