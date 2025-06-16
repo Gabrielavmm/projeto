@@ -1,7 +1,7 @@
 import Header from '../../components/Header';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { collection, addDoc, getDoc, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, getDoc, getDocs, updateDoc, doc, setDoc } from 'firebase/firestore';
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import KebabMenu from '../../components/KebabMenu';
@@ -14,17 +14,35 @@ export function Indicadores() {
     const [loading, setLoading] = useState(true);
     const [docId, setDocId] = useState<string | null>(null);
     const [editandoId, setEditandoId] = useState<number | null>(null);
+    const [cnpj, setCnpj] = useState<string>(''); // Estado para armazenar o CNPJ
+    
+    
+
 
     
    
 
 
     const AdicionarCaixinhas = () => {
+      if (!cnpj) {
+        alert('CNPJ não identificado! Faça login novamente.');
+        return;
+    }
+      
       const novaCaixinha = {
         id: Date.now(),
-        value: ''
+        value: '',
+        cnpj: cnpj, 
       };
+      
       setCaixinha([...caixinha, novaCaixinha]);
+      setEditandoId(novaCaixinha.id);
+      setTimeout(() => {
+        const inputElement = document.getElementById(`input-${novaCaixinha.id}`);
+        if (inputElement) {
+          inputElement.focus();
+        }
+      }, 50);
     }
 
     const atualizarCaixinha = (id: number, novoValor: string) => {
@@ -35,51 +53,46 @@ export function Indicadores() {
     }
   };
 
-    const removerCaixinha = async (id: number) => {
+  const removerCaixinha = async (id: number) => {
+    try {
+      const novasCaixinhas = caixinha.filter(item => item.id !== id);
+      setCaixinha(novasCaixinhas);
       
-  
-      try {
-        if (!docId) return;
-        
-        // Atualiza localmente
-        const novasCaixinhas = caixinha.filter(item => item.id !== id);
-        setCaixinha(novasCaixinhas);
-        
-        // Atualiza no Firebase
-        await updateDoc(doc(db, "indicadores", docId), {
-          indicadores: novasCaixinhas
-        });
-        
-      } catch (error) {
-        console.error("Erro ao remover:", error);
-        alert('Erro ao remover indicador');
-      }
-    };
+      // Atualiza o documento fixo
+      await setDoc(doc(db, "indicadores", "lista_principal"), {
+        indicadores: novasCaixinhas
+      }, { merge: true });
+      
+    } catch (error) {
+      console.error("Erro ao remover:", error);
+      alert('Erro ao remover indicador');
+    }
+  };
 
     const handleSubmit = async () => {
-      
-      
       try {
-     
         if (caixinha.some(c => c.value.trim() === '')) {
           alert('Preencha todos os indicadores!');
           return;
         }
     
-        
-        const docRef = await addDoc(collection(db, "indicadores"), {
-          indicadores: caixinha,
-          criadoEm: new Date(),
-          
-        });
+        setUpdating(true);
     
-        console.log("Documento salvo com ID: ", docRef.id);
-        alert('Indicadores cadastrados com sucesso!');
+        // Sempre usar o mesmo documento (cria ou atualiza)
+        const docRef = doc(db, "indicadores", "lista_principal");
+        
+        await setDoc(docRef, {
+          indicadores: caixinha,
+          ultimaAtualizacao: new Date()
+        }, { merge: true }); // O merge evita sobrescrever outros campos
+    
+        setDocId("lista_principal"); // Armazena o ID fixo
+        alert('Indicadores atualizados com sucesso!');
         navigate('/admin');
         
       } catch (error) {
-        console.error("Erro ao adicionar documento: ", error);
-        alert('Erro ao salvar!');
+        console.error("Erro ao salvar:", error);
+        alert('Erro ao salvar os indicadores');
       } finally {
         setUpdating(false);
       }
@@ -87,13 +100,16 @@ export function Indicadores() {
     useEffect(() => {
       const carregarIndicadores = async () => {
         try {
-          const querySnapshot = await getDocs(collection(db, "indicadores"));
-          const dados: any[] = [];
+          const docRef = doc(db, "indicadores", "lista_principal");
+          const docSnap = await getDoc(docRef);
           
-          if (!querySnapshot.empty) {
-            const doc = querySnapshot.docs[0]; // Pega o primeiro documento
-            setDocId(doc.id);
-            setCaixinha(doc.data().indicadores || []);
+          if (docSnap.exists()) {
+            setDocId("lista_principal");
+            setCaixinha(docSnap.data().indicadores || []);
+          } else {
+            // Cria documento vazio se não existir
+            await setDoc(docRef, { indicadores: [] });
+            setDocId("lista_principal");
           }
         } catch (error) {
           console.error("Erro ao carregar:", error);

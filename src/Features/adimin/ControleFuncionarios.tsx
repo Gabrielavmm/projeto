@@ -31,7 +31,7 @@ export function ControleFuncionario() {
           throw new Error("Usuário não autenticado");
         }
 
-        console.log("UID do usuário logado:", user.uid);
+       
 
         // Primeiro, pegar o CNPJ da empresa do usuário logado
         const userDoc = await getDoc(doc(db, "users", user.uid));
