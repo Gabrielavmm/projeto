@@ -18,6 +18,8 @@ export function ControleFuncionario() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  
+
 
   useEffect(() => {
     const fetchFuncionarios = async () => {

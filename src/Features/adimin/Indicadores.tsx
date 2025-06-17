@@ -5,48 +5,93 @@ import { collection, addDoc, getDoc, getDocs, updateDoc, doc, setDoc } from 'fir
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import KebabMenu from '../../components/KebabMenu';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { indicadoresService } from '../../Shared/lib/firestore/indicadores/indicadoresService';
+import toast from "react-hot-toast";
 
 
 export function Indicadores() {
-    const [caixinha, setCaixinha] = useState<{ id: number; value: string, isMenuOpen?:boolean }[]>([]);
-    const navigate = useNavigate();
-    const [updating, setUpdating] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [docId, setDocId] = useState<string | null>(null);
-    const [editandoId, setEditandoId] = useState<number | null>(null);
-    const [cnpj, setCnpj] = useState<string>(''); // Estado para armazenar o CNPJ
-    
-    
+  const [caixinha, setCaixinha] = useState<{ id: number; value: string, isMenuOpen?: boolean }[]>([]);
+  const navigate = useNavigate();
+  const [updating, setUpdating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [docId, setDocId] = useState<string | null>(null);
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [cnpj, setCnpj] = useState<string>('');
+  const [user, setUser] = useState<any>(null);
 
-
-    
-   
-
-
-    const AdicionarCaixinhas = () => {
-      if (!cnpj) {
-        alert('CNPJ não identificado! Faça login novamente.');
-        return;
-    }
-      
-      const novaCaixinha = {
-        id: Date.now(),
-        value: '',
-        cnpj: cnpj, 
-      };
-      
-      setCaixinha([...caixinha, novaCaixinha]);
-      setEditandoId(novaCaixinha.id);
-      setTimeout(() => {
-        const inputElement = document.getElementById(`input-${novaCaixinha.id}`);
-        if (inputElement) {
-          inputElement.focus();
+  // Carrega usuário e CNPJ
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUser(user);
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData?.cnpj) {
+              setCnpj(userData.cnpj);
+            } else {
+              alert('CNPJ não encontrado nos dados do usuário!');
+              navigate('/login');
+            }
+          }
+        } catch (error) {
+          console.error("Erro ao carregar usuário:", error);
+          alert('Erro ao carregar dados do usuário');
         }
-      }, 50);
-    }
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
 
-    const atualizarCaixinha = (id: number, novoValor: string) => {
-      if(editandoId == id){
+  // Carrega indicadores quando CNPJ muda
+  useEffect(() => {
+    const carregarIndicadores = async () => {
+      if (!cnpj) return;
+      
+      try {
+        setLoading(true);
+        const indicadores = await indicadoresService.getIndicadores(cnpj);
+        
+        if (indicadores.length === 0) {
+          await indicadoresService.createIndicadoresDoc(cnpj);
+        }
+        
+        setCaixinha(indicadores);
+        setDocId(cnpj);
+      } catch (error) {
+        console.error("Erro ao carregar:", error);
+        alert('Erro ao carregar indicadores');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    carregarIndicadores();
+  }, [cnpj]);
+
+  const AdicionarCaixinhas = () => {
+    const novaCaixinha = {
+      id: Date.now(),
+      value: '',
+      cnpj: cnpj,
+    };
+    
+    setCaixinha([...caixinha, novaCaixinha]);
+    setEditandoId(novaCaixinha.id);
+    
+    // Foco automático no novo input
+    setTimeout(() => {
+      
+      const inputElement = document.getElementById(`input-${novaCaixinha.id}`);
+      inputElement?.focus();
+    }, 50);
+  };
+
+  const atualizarCaixinha = (id: number, novoValor: string) => {
+    if (editandoId === id) {
       setCaixinha(caixinha.map(item => 
         item.id === id ? { ...item, value: novoValor } : item
       ));
@@ -57,68 +102,50 @@ export function Indicadores() {
     try {
       const novasCaixinhas = caixinha.filter(item => item.id !== id);
       setCaixinha(novasCaixinhas);
-      
-      // Atualiza o documento fixo
-      await setDoc(doc(db, "indicadores", "lista_principal"), {
-        indicadores: novasCaixinhas
-      }, { merge: true });
-      
+      await indicadoresService.updateIndicadores(cnpj, novasCaixinhas);
     } catch (error) {
       console.error("Erro ao remover:", error);
       alert('Erro ao remover indicador');
     }
   };
 
-    const handleSubmit = async () => {
-      try {
-        if (caixinha.some(c => c.value.trim() === '')) {
-          alert('Preencha todos os indicadores!');
-          return;
-        }
-    
-        setUpdating(true);
-    
-        // Sempre usar o mesmo documento (cria ou atualiza)
-        const docRef = doc(db, "indicadores", "lista_principal");
-        
-        await setDoc(docRef, {
-          indicadores: caixinha,
-          ultimaAtualizacao: new Date()
-        }, { merge: true }); // O merge evita sobrescrever outros campos
-    
-        setDocId("lista_principal"); // Armazena o ID fixo
-        alert('Indicadores atualizados com sucesso!');
-        navigate('/admin');
-        
-      } catch (error) {
-        console.error("Erro ao salvar:", error);
-        alert('Erro ao salvar os indicadores');
-      } finally {
-        setUpdating(false);
+  const handleSubmit = async () => {
+    try {
+      // Validações
+      if (!cnpj) {
+        alert('CNPJ não identificado! Faça login novamente.');
+        return;
       }
-    };
-    useEffect(() => {
-      const carregarIndicadores = async () => {
-        try {
-          const docRef = doc(db, "indicadores", "lista_principal");
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            setDocId("lista_principal");
-            setCaixinha(docSnap.data().indicadores || []);
-          } else {
-            // Cria documento vazio se não existir
-            await setDoc(docRef, { indicadores: [] });
-            setDocId("lista_principal");
-          }
-        } catch (error) {
-          console.error("Erro ao carregar:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      carregarIndicadores();
-    }, []);
+
+      if (caixinha.some(c => c.value.trim() === '')) {
+        toast.error('Preencha todos os indicadores!');
+        
+       return;
+      }
+
+      setUpdating(true);
+      await indicadoresService.saveIndicadores(cnpj, caixinha);
+      toast.success('Indicadores atualizados com sucesso!');
+      
+      setTimeout(() => {
+        navigate('/admin');
+      }, 1500)
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      toast.error('Erro ao salvar os indicadores');
+      
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="loading">Carregando...</div>;
+  }
+
+   
+    
+  
 
     return (
       <div className='bg-custom-bg' style={{ minHeight: '120vh'}}>
@@ -206,7 +233,7 @@ export function Indicadores() {
         disabled={updating}
         style={{  height: '35px', width:'85%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}
       >
-        {updating ? 'Salvando...' : 'Cadastrar'}
+        {updating ? 'Salvando...' : 'Salvar'}
       </button>
       <button
         onClick={() => navigate('/admin')}
