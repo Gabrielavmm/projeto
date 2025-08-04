@@ -215,12 +215,26 @@ export function EditarperfilEmpresa() {
     
       <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
         <HeaderEmpresa />
+        
 
         {loading ? (
             <p>Carregando dados do perfil...</p>
           ) : (
+            <div style={{ 
+              width: '100%', 
+              maxWidth: '800px',  
+              margin: '0 auto',
+              padding: window.innerWidth < 768 ? '0 20px' : '0'  , boxSizing: 'border-box' 
+        }}>
         <div className="relative">
-        <label htmlFor="nome" className="font-medium bg-custom-dark" style={{ display: 'block', marginBottom: '7px', fontSize: '13px', width: '38%', marginTop: '40px'}}>
+        <label htmlFor="nome" className="font-medium bg-custom-dark" 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
           Nome completo:
         </label>
         <input
@@ -230,13 +244,20 @@ export function EditarperfilEmpresa() {
           onChange={(e) => setUserData({...userData, name: e.target.value})}
           color="red"
           className="w-full p-4 text-base bg-gray-100 rounded-lg border-none focus:ring-2 focus:ring-blue-500" 
-          style={{height: '30px', width: '81%'}}
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
           required
         />
         <div>
         {/* CNPJ */}
-        <label htmlFor="cnpj" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px', marginTop:' 17px', fontSize: '13px', width: '54%' }}>
-          CNPJ da empresa vinculada:</label>
+        <label htmlFor="cnpj" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
+          CNPJ da empresa:</label>
         <input
             id="cnpj"
             type="text"
@@ -249,20 +270,29 @@ export function EditarperfilEmpresa() {
                   setTimeout(() => setToastShown(false), 1000); 
                 }
               }}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%', cursor: 'not-allowed', backgroundColor: '#E2E8F0'}}
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none',backgroundColor: '#E2E8F0' }}
             required
         />
         </div>
         <div>
         {/* Email */}
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '13px', width: '24%' }}>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
           Email:</label>
         <input
           id="email"
           type="email"
           value={userData.email}
           onChange={(e) => setUserData({...userData, email: e.target.value})}
-          className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%'}}
+          className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
           required
         />
 
@@ -270,7 +300,14 @@ export function EditarperfilEmpresa() {
         </div>
         <div>
         {/* Senha Atual */}
-        <label htmlFor="senhaAtual" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:'17px', fontSize: '13px', width: '32%' }}>
+        <label htmlFor="senhaAtual" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
           Senha atual:
         </label>
         <input
@@ -280,14 +317,22 @@ export function EditarperfilEmpresa() {
 
           value={userData.senhaAtual}
           onChange={(e) => setUserData({...userData, senhaAtual: e.target.value})}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%'}}
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
           required
         />
 
         </div>
         <div>
         {/* Nova Senha */}
-        <label htmlFor="newpassword" className="block text-sm font-medium text-gray-700 " style={{ display: 'block', marginBottom: '7px',marginTop:' 17px', fontSize: '13px', width: '33%' }}>
+        <label htmlFor="newpassword" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
           Nova senha:
         </label>
         <input
@@ -296,12 +341,30 @@ export function EditarperfilEmpresa() {
           placeholder=" Ex: ********"
           value={userData.newpassword}
           onChange={(e) => setUserData({...userData, newpassword: e.target.value})}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%'}}
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
           required
         />
         </div>
-        <fieldset style ={{marginTop:'200px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
-        <button 
+        <div style={{ 
+        
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '200vw',
+        height: '0',
+       
+      }}>
+
+        <fieldset style={{
+        marginTop: window.innerWidth < 768 ? '150px' : '260px',
+        padding: '0',
+        backgroundColor: '#E2E8F0',
+        border: 'none',
+        height: '1px'
+      }}></fieldset>
+      </div>
+
+<button 
           onClick={handleUpdate}
           disabled={updating}
           style={{marginTop: '15px', height: '35px', width:'85%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
@@ -311,6 +374,8 @@ export function EditarperfilEmpresa() {
           onClick={() => navigate('/empresa')}
           style={{marginTop: '10px', height: '35px', width:'85%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
             Voltar</button>
+
+            </div>
                 
         
       </div>

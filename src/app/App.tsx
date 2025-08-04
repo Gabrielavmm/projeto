@@ -5,17 +5,19 @@ import { Registro } from '../Features/auth/Registro';
 import { RegistroEmpresa } from '../Features/auth/RegistroEmpresa';
 import { RegistroFuncionario } from '../Features/auth/RegistroFuncionario';
 import { Grafico } from '../Features/Funcionarios/Grafico';
-import { PaginadeEspera } from '../Features/home/PaginadeEspera';
+import { GraficoEmpresa } from '../Features/Empresa/GraficoEmpresa';
+
+
 
 import { Navigate } from 'react-router-dom';
 import { HomeAdmin } from '../Features/adimin/HomeAdmin';
 import { HomeEmpresa } from '../Features/Empresa/HomeEmpresa';
 import { Indicadores } from '../Features/adimin/Indicadores';
+import { GraficoAdm } from '../Features/adimin/GraficoAdm';
 import { ControleFuncionario } from '../Features/adimin/ControleFuncionarios';
 import { EditarPerfil } from '../Features/adimin/EditarPerfil';
 import { EditarperfilFuncionario } from '../Features/Funcionarios/EditarPerfilFuncionario';
 import { EditarperfilEmpresa } from '../Features/Empresa/EditarperfilEmpresa';
-
 import { Opcao } from '../Features/home/OpcaoRegistro';
 import { ResetPassword } from '../Features/auth/ResetPassword';
 import { HomeFuncionario } from '../Features/Funcionarios/HomeFuncionario';
@@ -37,16 +39,18 @@ function App() {
         <Route path="/opcao" element={<Opcao />} />
         <Route path="/registro-empresa" element={<RegistroEmpresa />} />
         <Route path="/registro-funcionario" element={<RegistroFuncionario />} />
-        <Route path="/paginadeespera" element={<PaginadeEspera />} />
+        <Route path="/grafico-empresa" element={<GraficoEmpresa />} />
+       
         
         <Route path="/register" element={<Registro />} />
         <Route path="/forgot-password" element={<ResetPassword />} />
         <Route path="/admin" element={<HomeAdmin />} />
         <Route path="/empresa" element={<HomeEmpresa />} />
         <Route path="/funcionario" element={<HomeFuncionario />} />
-        <Route path="indicadores" element={<Indicadores />} />
-        <Route path="grafico" element={<Grafico />} />
-        <Route path="controle-funcionarios" element={<ControleFuncionario />} />
+        <Route path="/indicadores" element={<Indicadores />} />
+        <Route path="/grafico-adm" element={<GraficoAdm />} />
+        <Route path="/grafico" element={<Grafico />} />
+        <Route path="/controle-funcionarios" element={<ControleFuncionario />} />
         <Route path="/editar-perfil" element={<EditarPerfil />} />
         <Route path="/editar-perfil-funcionario" element={<EditarperfilFuncionario />} />
         <Route path="/editar-perfil-empresa" element={<EditarperfilEmpresa />} />

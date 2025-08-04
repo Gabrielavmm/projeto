@@ -119,7 +119,7 @@ const HeaderEmpresa = () => {
                 fontWeight: 'regular',
                 width: '42%', 
                 marginTop: '40px',
-            }}>Gráficos</li>
+            }} onClick={() => navigate('/grafico-empresa')}>Gráficos</li>
             
             <li style={{
              fontSize: '15px',

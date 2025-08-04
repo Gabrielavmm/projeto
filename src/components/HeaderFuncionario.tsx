@@ -121,11 +121,11 @@ const HeaderFuncionario = () => {
                 marginTop: '40px',
             }} onClick={()=> navigate('/grafico')} >Gráficos</li>
             
-          <li style ={{
-            fontSize: '15px',
-            fontWeight: 'regular',
-            width: '50%' , marginTop: '15px'
-          }} onClick={()=> ('/funcionario')}>Indicadores</li>
+            <li style={{
+                fontSize: '15px',
+                fontWeight: 'regular',
+                width: '50%' , marginTop: '15px'
+            }} onClick={() => navigate('/funcionario')}>Indicadores</li>
             <li style={{
                 fontSize: '15px',
                 fontWeight: 'regular',

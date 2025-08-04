@@ -194,8 +194,20 @@ export function HomeFuncionario() {
   return (
     <div className="flex flex-col items-center justify-center bg-custom-bg" style={{ textAlign: 'center', minHeight: '120vh' }}>
       <HeaderFuncionario />
+      <div style={{ 
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
       
       <form onSubmit={handleSubmit} style={{ width: '90%', maxWidth: '600px', marginTop: '20px' }}>
+      <div style={{ 
+      width: '100%', 
+      maxWidth: '800px',  
+      margin: '0 auto',
+      padding: window.innerWidth < 768 ? '0 20px' : '0'  , boxSizing: 'border-box' 
+}}>
         {/* Campo de seleção do indicador */}
         <h2 style={{ fontSize: '18px', fontWeight: 'bold', fontFamily: 'inter', textAlign: 'left', marginBottom: '10px', marginLeft: '12px' }}>
           Indicador
@@ -275,8 +287,34 @@ export function HomeFuncionario() {
           />
         </div>
         
-        <fieldset style={{ marginTop: '200px', padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+        </div>
+        <div style={{ 
         
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '200vw',
+          height: '0',
+         
+        }}>
+
+        <fieldset 
+        
+        style={{
+          marginTop: window.innerWidth < 768 ? '100px' : '260px',
+          padding: '0',
+          backgroundColor: '#E2E8F0',
+          border: 'none',
+          height: '1px',}}></fieldset></div>
+          
+          
+
+
+        <div style={{
+        marginTop: '12px',
+        marginBottom: window.innerWidth < 768 ? '20px' : '30px', 
+        fontSize: window.innerWidth < 768 ? '14px' : '16px',
+        textAlign: 'center'
+      }}>
         <button 
           type="submit"
           style={{ marginTop: '15px', height: '35px', width: '85%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px', border: 'none', fontSize: '16px', fontWeight: 'semi-bold' }}
@@ -284,7 +322,11 @@ export function HomeFuncionario() {
         >
           {loading ? 'Carregando...' : 'Salvar'}
         </button>
+        </div>
+        
       </form>
+      
+    </div>
     </div>
   );
 }

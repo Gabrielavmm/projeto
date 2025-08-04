@@ -123,6 +123,12 @@ export function HomeEmpresa() {
   return (
     <div className="flex flex-col items-center justify-center bg-custom-bg" style={{ textAlign: 'center', minHeight: '120vh' }}>
       <HeaderEmpresa />
+      <div style={{ 
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
       
       <div style={{ width: '90%', maxWidth: '600px', marginTop: '20px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: 'bold', fontFamily: 'inter', textAlign: 'left', marginBottom: '10px' }}>
@@ -182,6 +188,7 @@ export function HomeEmpresa() {
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

@@ -118,7 +118,7 @@ const Header = () => {
                 fontWeight: 'regular',
                 width: '42%', 
                 marginTop: '40px',
-            }}>Gráficos</li>
+            }} onClick={() => navigate('/grafico-adm')}>Gráficos</li>
             <li  style={{
                 marginTop: '15px',
                 fontSize: '15px',

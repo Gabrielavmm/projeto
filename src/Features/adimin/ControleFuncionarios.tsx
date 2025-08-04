@@ -126,7 +126,12 @@ export function ControleFuncionario() {
   return (
     <div className="flex flex-col items-center justify-center bg-custom-bg" style={{ textAlign: 'center', minHeight: '120vh' }}>
       <Header />
-      
+      <div style={{ 
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
       <div style={{ width: '90%', maxWidth: '600px', marginTop: '20px' }}>
         <h2 style={{ fontSize: '18px', fontWeight: 'bold', fontFamily: 'inter', textAlign: 'left', marginBottom: '10px' }}>
           Buscar Funcionário
@@ -138,7 +143,8 @@ export function ControleFuncionario() {
             placeholder="Digite o nome do funcionário"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ height: '40px', width: '100%', padding: '0 10px', borderRadius: '5px', border: '1px solid #ccc' }}
+            style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
+            
           />
         </div>
         
@@ -186,16 +192,34 @@ export function ControleFuncionario() {
             </div>
             
           )}
-          <fieldset style ={{marginTop:'200px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+         <div style={{ 
+        
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '200vw',
+        height: '0',
+       
+      }}>
+
+        <fieldset style={{
+        marginTop: window.innerWidth < 768 ? '220px' : '300px',
+        padding: '0',
+        backgroundColor: '#E2E8F0',
+        border: 'none',
+        height: '1px'
+      }}></fieldset>
+      </div>
           
           <button
           onClick={() => navigate('/admin')}
-          style={{marginTop: '10px', height: '35px', width:'85%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
+          
+          style={{marginTop: '10px', height: '35px', width:'98%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
             Voltar</button>
                 
                 
           
         </div>
+      </div>
       </div>
       
     </div>
