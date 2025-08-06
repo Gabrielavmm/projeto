@@ -1,30 +1,45 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../Shared/lib/firestore/auth";
+import toast from "react-hot-toast";
 
 export function RegistroEmpresa() {
   const [name, setName] = useState('');
   const [cnpj, setCnpj] = useState('');
-  //const [endereco, setEndereco] = useState('');
+ 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
+    setLoading(true);
+    toast.dismiss();
+
+    // Validação básica do CNPJ (14 dígitos numéricos)
+    const cnpjNumerico = cnpj.replace(/\D/g, '');
+    if (cnpjNumerico.length !== 14) {
+      toast.error('CNPJ deve conter 14 dígitos');
+      setLoading(false);
+      return;
+    }
     
     try {
-      await register(email, password, {
-        name,
-        cnpj,
-        //endereco,
-        email
-      });
+      await register(email, password, { name, cnpj: cnpjNumerico 
+    }, "empresa"); 
+      toast.success('Empresa cadastrada com sucesso');
       navigate('/empresa');
     } catch (error) {
-      console.error('Erro ao registrar empresa:', error);
+      if ((error as Error).message.includes("CNPJ já cadastrado")) {
+        toast.error("Este CNPJ já possui cadastro");
+      } else {
+        toast.error((error as Error).message);
+      }
     }
+
+    
   }
 
 
@@ -41,89 +56,139 @@ export function RegistroEmpresa() {
       </h1>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
-
-      {/* Nome */}
-      <div className="relative">
-        <label htmlFor="nome" className="font-medium bg-custom-dark" style={{ display: 'block', marginBottom: '7px', fontSize: '13px', width: '41%' }}>
-          Nome da empresa:
-        </label>
+      <div style={{ 
+      width: '100%', 
+      maxWidth: '800px',  
+      margin: '0 auto',
+      padding: window.innerWidth < 768 ? '0 20px' : '0'  , boxSizing: 'border-box' 
+}}>
+        {/* Nome */}
+        <div className="relative">
+        
+        <label htmlFor="nome" 
+        className="font-medium bg-custom-dark md:w-[23%]"
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
+          Nome completo:   </label>
+          
         <input
-          value={name}
+          value ={name} 
+          
           id="nome"
           type="text"
           onChange={(e) => setName(e.target.value)}
-          className=" w-full p-4 text-base bg-gray-100 rounded-lg border-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%', marginBottom:'7px'}}
-          placeholder=" Ex: Baker CIA. "
+          className=" w-full p-4 text-base bg-gray-100 rounded-lg border-none focus:ring-2 focus:ring-blue-500" 
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
+          placeholder=" Ex: João da Silva "
           required
         />
-        </div>
+        <div>
 
         {/* CNPJ */}
-        <div className="relative">
-          <label htmlFor="cnpj" className="font-medium bg-custom-dark" style={{ display: 'block', marginBottom: '7px', fontSize: '13px', width: '22%' }}>
-            CNPJ:
-          </label>
-          <input
+        <label htmlFor="cnpj" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
+          CNPJ da empresa vinculada:</label>
+        <input
             value={cnpj}
             id="cnpj"
             type="text"
             onChange={(e) => setCnpj(e.target.value)}
-            className=" w-full p-4 text-base bg-gray-100 rounded-lg border-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%', marginBottom:'7px'}}
-            placeholder=" Ex: 12.345.678/0001-90 "
+            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
+            placeholder=" Ex: 12.345.678/0001-90"
             required
-          />
+        />
+       
         </div>
-        {/* Endereço */}
-        
+
         {/* Email */}
-        <div >
-        <label htmlFor="email" className="font-medium bg-custom-dark" style={{ display: 'block', marginBottom: '7px', fontSize: '13px', width: '24%' }}>
-          Email: </label>
-          <input
+        <div>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
+          Email:   </label>
+        <input
           value={email}
           id="email"
           onChange={(e) => setEmail(e.target.value)}
           type="email"
-          className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%', marginBottom:'7px'}}
+          className="w-full  p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
           placeholder=" Ex: seu@email.com"
           required
         />
-
-        </div>
+      </div>
         {/* Senha */}
         <div>
-        <label htmlFor="password" className="font-medium bg-custom-dark" style={{ display: 'block', marginBottom: '7px', fontSize: '13px', width: '25%' }}>
-          Senha:</label>
-          
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700 " 
+        style={{ 
+          display: 'block', 
+          marginBottom: '7px', 
+          fontSize: '13px', 
+          width: '100%',
+          textAlign: 'left'
+        }}>
+          Senha:
+        </label>
         <input
           value={password}
           id="password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" style={{height: '30px', width: '81%'}}
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+          style={{height: '30px', width: '100%', marginBottom:'7px', outline: 'none', }}
           placeholder=" ********"
           required
         />
         </div>
-
-         {/* Botão de Registro */}
-         <button
+        {/* Botão de Registro */}
+        <button
           type='submit'
           onClick={handleSubmit}
-          style={{marginTop: '22px', height: '35px', width:'81%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '12px', fontWeight: 'semi-bold'}}
+          style={{marginTop: '22px', height: '30px', width:'100%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '12px', fontWeight: 'semi-bold'}}
          >CADASTRAR</button>
+         </div>
 
-        <fieldset style ={{marginTop:'150px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+        </div>
+        
+        </form>
+        <fieldset style={{
+        marginTop: window.innerWidth < 768 ? '150px' : '260px',
+        padding: '0',
+        backgroundColor: '#E2E8F0',
+        border: 'none',
+        height: '1px'
+      }}></fieldset>
 
-
-
-      </form>
-      <div style={{marginTop: '12px', fontSize: '13px'}}>
+      <div style={{
+        marginTop: '12px',
+        marginBottom: window.innerWidth < 768 ? '20px' : '30px', 
+        fontSize: window.innerWidth < 768 ? '14px' : '16px',
+        textAlign: 'center'
+      }}>
         <span className="text-gray-600">Já tem conta? </span>
         <Link to="/login" className='text-custom-green'>
         Entrar
         </Link>
         </div>
-      </div>
-  )
+        </div>
+       
+        
+    )
 }

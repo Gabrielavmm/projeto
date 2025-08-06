@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import HeaderEmpresa from "../../components/HeaderEmpresa";
+import HeaderFuncionario from "../../components/HeaderFuncionario";
 import { EmailAuthProvider, getAuth, reauthenticateWithCredential, sendEmailVerification, updatePassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -7,7 +7,8 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { FirebaseError } from "firebase/app";
 
-export function EditarperfilEmpresa() {
+
+export function EditarperfilFuncionario() {
   const [userData, setUserData] = useState({
     name: "",
     cnpj: "",
@@ -146,7 +147,7 @@ export function EditarperfilEmpresa() {
           cnpj: userData.cnpj
         });
         toast.success('Perfil atualizado com sucesso!');
-        navigate('/empresa');
+        navigate('/funcionario');
       }
     } catch (error) {
       console.error(error);
@@ -214,8 +215,7 @@ export function EditarperfilEmpresa() {
   return (
     
       <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
-        <HeaderEmpresa />
-        
+        <HeaderFuncionario />
 
         {loading ? (
             <p>Carregando dados do perfil...</p>
@@ -257,7 +257,7 @@ export function EditarperfilEmpresa() {
           width: '100%',
           textAlign: 'left'
         }}>
-          CNPJ da empresa:</label>
+          CNPJ da empresa vinculada:</label>
         <input
             id="cnpj"
             type="text"
@@ -278,7 +278,7 @@ export function EditarperfilEmpresa() {
         <div>
         {/* Email */}
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 " 
-        style={{ 
+         style={{ 
           display: 'block', 
           marginBottom: '7px', 
           fontSize: '13px', 
@@ -326,7 +326,7 @@ export function EditarperfilEmpresa() {
         <div>
         {/* Nova Senha */}
         <label htmlFor="newpassword" className="block text-sm font-medium text-gray-700 " 
-        style={{ 
+         style={{ 
           display: 'block', 
           marginBottom: '7px', 
           fontSize: '13px', 
@@ -346,6 +346,7 @@ export function EditarperfilEmpresa() {
           required
         />
         </div>
+        </div>
         <div style={{ 
         
         left: '50%',
@@ -354,7 +355,6 @@ export function EditarperfilEmpresa() {
         height: '0',
        
       }}>
-
         <fieldset style={{
         marginTop: window.innerWidth < 768 ? '150px' : '260px',
         padding: '0',
@@ -364,20 +364,19 @@ export function EditarperfilEmpresa() {
       }}></fieldset>
       </div>
 
-<button 
+        <button 
           onClick={handleUpdate}
           disabled={updating}
           style={{marginTop: '15px', height: '35px', width:'85%', backgroundColor: '#22C55E', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
             Editar
           </button>
           <button
-          onClick={() => navigate('/empresa')}
+          onClick={() => navigate('/funcionario')}
           style={{marginTop: '10px', height: '35px', width:'85%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
             Voltar</button>
-
-            </div>
                 
         
+     
       </div>
       
      

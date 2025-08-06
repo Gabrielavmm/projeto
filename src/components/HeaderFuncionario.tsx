@@ -2,7 +2,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const HeaderEmpresa = () => {
+const HeaderFuncionario = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
       const navigate = useNavigate();
   
@@ -119,18 +119,18 @@ const HeaderEmpresa = () => {
                 fontWeight: 'regular',
                 width: '42%', 
                 marginTop: '40px',
-            }} onClick={() => navigate('/grafico-empresa')}>Gráficos</li>
+            }} onClick={()=> navigate('/grafico')} >Gráficos</li>
             
-            <li style={{
-             fontSize: '15px',
-                fontWeight: 'regular',
-                width: '53%' , marginTop: '15px'
-            }} onClick={() => navigate('/empresa')} >Funcionários</li>
             <li style={{
                 fontSize: '15px',
                 fontWeight: 'regular',
                 width: '50%' , marginTop: '15px'
-            }} onClick={() => navigate('/editar-perfil-empresa')}>Editar perfil</li>
+            }} onClick={() => navigate('/funcionario')}>Indicadores</li>
+            <li style={{
+                fontSize: '15px',
+                fontWeight: 'regular',
+                width: '50%' , marginTop: '15px'
+            }} onClick={() => navigate('/editar-perfil-funcionario')}>Editar perfil</li>
             <li style={{
                 fontSize: '15px',
                 fontWeight: 'regular',
@@ -162,4 +162,4 @@ const HeaderEmpresa = () => {
       )}
     </>
   );
-    }; export default HeaderEmpresa;
+    }; export default HeaderFuncionario;

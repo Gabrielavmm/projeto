@@ -16,13 +16,16 @@ export function Opcao(){
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            gap: '12px',
+            width: '100%',
             
         }}>
         <button
         onClick={() => navigate('/register')}
         style={{ fontSize: '15px',  height: '120px', width: '30%', backgroundColor: "#FFFFFF",  color:'#2F2F2F', 
                   border: '1px solid #E2E8F0', 
-                borderRadius: '8px'  }}>Administrador</button>
+                borderRadius: '8px',
+                  }}>Administrador</button>
 
 
         <button
@@ -32,19 +35,27 @@ export function Opcao(){
                 borderRadius: '8px', marginTop: '5px'  }}>Empresa</button>
 
         <button
-        onClick={() => navigate('/RegistroFuncionario')}
+        onClick={() => navigate('/registro-funcionario')}
         style={{ fontSize: '15px',  height: '120px', width: '30%', backgroundColor: "#FFFFFF",  color:'#2F2F2F', 
                   border: '1px solid #E2E8F0', 
                 borderRadius: '8px', marginTop: '5px'  }}>Funcionário</button>
 
 
         </div>
-        <fieldset style ={{marginTop:'150px',  padding: '1.5px', backgroundColor: '#E2E8F0', border: 'none' }}></fieldset>
+        <fieldset style={{
+        marginTop: window.innerWidth < 768 ? '50px' : '160px',
+        padding: '0',
+        backgroundColor: '#E2E8F0',
+        border: 'none',
+        height: '1px'
+      }}></fieldset>
+     
         <button
           onClick={() => navigate('/login')}
-          style={{marginTop: '10px', height: '35px', width:'85%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
+          style={{marginTop: '10px', height: '35px', width:'60%', backgroundColor: '#D9D9D9', color: 'white', borderRadius: '5px',border: 'none', fontSize: '16px', fontWeight: 'semi-bold'}}>
             Voltar</button>
+            </div>
                 
-        </div>
+        
     )
 }
