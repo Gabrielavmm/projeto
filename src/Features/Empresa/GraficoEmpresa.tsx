@@ -166,19 +166,40 @@ export function GraficoEmpresa() {
     try {
       setIsGeneratingPDF(true);
       
-      // Scroll para o topo antes de capturar
+      // Salva o estado original do layout
+      const originalStyles = {
+        width: element.style.width,
+        height: element.style.height,
+        overflow: element.style.overflow
+      };
+  
+      // Força dimensões fixas para captura consistente
+      element.style.width = '800px'; // Largura fixa para desktop
+      element.style.height = 'auto';
+      element.style.overflow = 'visible';
+  
+      // Scroll para o topo e aguarda renderização
       window.scrollTo(0, 0);
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
   
       const canvas = await html2canvas(element, {
-        scale: 2, // Alta qualidade
+        scale: 3, // Aumenta a qualidade
         useCORS: true,
         allowTaint: true,
-        width: element.scrollWidth,
+        width: 800, // Largura consistente
         height: element.scrollHeight,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 800, // Força viewport desktop
+        windowHeight: element.scrollHeight
       });
+  
+      // Restaura estilos originais
+      element.style.width = originalStyles.width;
+      element.style.height = originalStyles.height;
+      element.style.overflow = originalStyles.overflow;
   
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png', 1.0);
@@ -186,10 +207,30 @@ export function GraficoEmpresa() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
   
-      // Ajusta a altura para caber em uma única página (compreensível)
-      const adjustedHeight = Math.min(pdfHeight, pdf.internal.pageSize.getHeight() * 10); // Limite razoável
+      // Divide em múltiplas páginas se necessário
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, adjustedHeight);
+      while (position < pdfHeight) {
+        if (position > 0) {
+          pdf.addPage();
+        }
+        
+        const remainingHeight = pdfHeight - position;
+        const pageImgHeight = Math.min(pageHeight, remainingHeight);
+        
+        pdf.addImage(
+          imgData, 
+          'PNG', 
+          0, 
+          -position * (pageHeight / pdfHeight), 
+          pdfWidth, 
+          pdfHeight
+        );
+        
+        position += pageHeight;
+      }
+  
       pdf.save('relatorio-admin.pdf');
       
       toast.success('PDF gerado com sucesso!');
@@ -212,7 +253,7 @@ export function GraficoEmpresa() {
     
       <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
     <HeaderEmpresa />
-    <div className="w-full max-w-6xl px-4 md:px-6" ref={pdfRef}>
+    <div className="w-full max-w-6xl px-4 md:px-6" ref={pdfRef} style={{ minWidth: '800px' }}>
     <div className="flex justify-between items-center mb-6">
     <button
   onClick={exportToPDF}
