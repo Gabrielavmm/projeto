@@ -166,33 +166,30 @@ export function GraficoEmpresa() {
     try {
       setIsGeneratingPDF(true);
       
-      // 1. Clona o elemento para manipulação
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.width = '210mm'; // Largura A4
-      clone.style.padding = '20mm';
-      document.body.appendChild(clone);
-      clone.style.position = 'absolute';
-      clone.style.left = '-9999px';
-      
-      // 2. Captura o clone
-      const canvas = await html2canvas(clone, {
-        scale: 2,
+      // Scroll para o topo antes de capturar
+      window.scrollTo(0, 0);
+      await new Promise(resolve => setTimeout(resolve, 300));
+  
+      const canvas = await html2canvas(element, {
+        scale: 2, // Alta qualidade
         useCORS: true,
+        allowTaint: true,
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        logging: false,
         backgroundColor: '#ffffff'
       });
-      
-      // 3. Remove o clone
-      document.body.removeChild(clone);
-      
-      // 4. Cria PDF
+  
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png', 1.0);
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
   
-      // 5. Adiciona imagem ajustada
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // Ajusta a altura para caber em uma única página (compreensível)
+      const adjustedHeight = Math.min(pdfHeight, pdf.internal.pageSize.getHeight() * 10); // Limite razoável
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, adjustedHeight);
       pdf.save('relatorio-admin.pdf');
       
       toast.success('PDF gerado com sucesso!');
