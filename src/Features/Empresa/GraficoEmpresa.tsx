@@ -166,41 +166,35 @@ export function GraficoEmpresa() {
     try {
       setIsGeneratingPDF(true);
       
-      // Opções para melhor captura do html2canvas
-      const canvas = await html2canvas(element, {
-        scale: 2, // Aumenta a qualidade
-        useCORS: true, // Permite imagens cross-origin
-        allowTaint: true, // Permite conteúdo externo
-        scrollY: -window.scrollY, // Remove scroll
-        width: element.scrollWidth,
-        height: element.scrollHeight,
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight
+      // 1. Clona o elemento para manipulação
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.style.width = '210mm'; // Largura A4
+      clone.style.padding = '20mm';
+      document.body.appendChild(clone);
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      
+      // 2. Captura o clone
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
       });
-  
+      
+      // 3. Remove o clone
+      document.body.removeChild(clone);
+      
+      // 4. Cria PDF
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgData = canvas.toDataURL('image/png', 1.0);
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
   
-      // Adiciona a imagem ao PDF
+      // 5. Adiciona imagem ajustada
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      
-      // Se o conteúdo for muito longo, adiciona páginas extras
-      let heightLeft = pdfHeight;
-      let position = 0;
-  
-      while (heightLeft > 0) {
-        position = heightLeft - pdf.internal.pageSize.getHeight();
-        if (position < 0) break;
-        
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, -position, pdfWidth, pdfHeight);
-        heightLeft -= pdf.internal.pageSize.getHeight();
-      }
-  
       pdf.save('relatorio-admin.pdf');
+      
       toast.success('PDF gerado com sucesso!');
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
