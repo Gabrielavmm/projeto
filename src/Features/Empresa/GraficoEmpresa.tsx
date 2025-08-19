@@ -165,23 +165,50 @@ export function GraficoEmpresa() {
   
     try {
       setIsGeneratingPDF(true);
-      const canvas = await html2canvas(element);
+      
+      // Opções para melhor captura do html2canvas
+      const canvas = await html2canvas(element, {
+        scale: 2, // Aumenta a qualidade
+        useCORS: true, // Permite imagens cross-origin
+        allowTaint: true, // Permite conteúdo externo
+        scrollY: -window.scrollY, // Remove scroll
+        width: element.scrollWidth,
+        height: element.scrollHeight,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
+      });
+  
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
+  
+      // Adiciona a imagem ao PDF
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      // Se o conteúdo for muito longo, adiciona páginas extras
+      let heightLeft = pdfHeight;
+      let position = 0;
+  
+      while (heightLeft > 0) {
+        position = heightLeft - pdf.internal.pageSize.getHeight();
+        if (position < 0) break;
+        
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, -position, pdfWidth, pdfHeight);
+        heightLeft -= pdf.internal.pageSize.getHeight();
+      }
+  
       pdf.save('relatorio-admin.pdf');
       toast.success('PDF gerado com sucesso!');
     } catch (error) {
-      console.error(error);
+      console.error('Erro ao gerar PDF:', error);
       toast.error('Falha ao gerar PDF');
     } finally {
       setIsGeneratingPDF(false);
     }
   };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
