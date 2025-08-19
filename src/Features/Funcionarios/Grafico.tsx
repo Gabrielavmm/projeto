@@ -154,31 +154,76 @@ export function Grafico() {
     try {
       setIsGeneratingPDF(true);
       
-      // Configurações adicionais para melhorar a captura
+      // Salva o estado original do layout
+      const originalStyles = {
+        width: element.style.width,
+        height: element.style.height,
+        overflow: element.style.overflow
+      };
+  
+      // Força dimensões fixas para captura consistente
+      element.style.width = '800px'; // Largura fixa para desktop
+      element.style.height = 'auto';
+      element.style.overflow = 'visible';
+  
+      // Scroll para o topo e aguarda renderização
+      window.scrollTo(0, 0);
+      await new Promise(resolve => setTimeout(resolve, 500));
+  
       const canvas = await html2canvas(element, {
-        scale: 2, // Melhora a qualidade
-        logging: true, // Habilita logs para debug
-        useCORS: true, // Permite recursos cross-origin
-        allowTaint: true, // Permite imagens externas
-        scrollY: -window.scrollY // Corrige posicionamento
+        scale: 3, // Aumenta a qualidade
+        useCORS: true,
+        allowTaint: true,
+        width: 800, // Largura consistente
+        height: element.scrollHeight,
+        logging: false,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 800, // Força viewport desktop
+        windowHeight: element.scrollHeight
       });
-      
+  
+      // Restaura estilos originais
+      element.style.width = originalStyles.width;
+      element.style.height = originalStyles.height;
+      element.style.overflow = originalStyles.overflow;
+  
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
-      // Calcula dimensões mantendo proporção
-      const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // Margem de 10mm cada lado
+      const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  
+      // Divide em múltiplas páginas se necessário
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Centraliza a imagem no PDF
-      const xPosition = 10; // Margem esquerda
-      const yPosition = 10; // Margem superior
+      while (position < pdfHeight) {
+        if (position > 0) {
+          pdf.addPage();
+        }
+        
+        const remainingHeight = pdfHeight - position;
+        const pageImgHeight = Math.min(pageHeight, remainingHeight);
+        
+        pdf.addImage(
+          imgData, 
+          'PNG', 
+          0, 
+          -position * (pageHeight / pdfHeight), 
+          pdfWidth, 
+          pdfHeight
+        );
+        
+        position += pageHeight;
+      }
+  
+      pdf.save('relatorio-admin.pdf');
       
-      pdf.addImage(imgData, 'PNG', xPosition, yPosition, pdfWidth, pdfHeight);
-      pdf.save('relatorio-indicadores.pdf');
       toast.success('PDF gerado com sucesso!');
     } catch (error) {
-      console.error("Erro detalhado:", error);
+      console.error('Erro ao gerar PDF:', error);
       toast.error('Falha ao gerar PDF');
     } finally {
       setIsGeneratingPDF(false);
