@@ -253,7 +253,7 @@ export function GraficoEmpresa() {
     
       <div className="flex flex-col items-center justify-center  bg-custom-bg"style={{textAlign:'center', minHeight: '120vh'}}>
     <HeaderEmpresa />
-    <div className="w-full max-w-6xl px-4 md:px-6" ref={pdfRef} style={{ minWidth: '800px' }}>
+    <div className="w-full max-w-6xl px-4 md:px-6" ref={pdfRef}>
     <div className="flex justify-between items-center mb-6">
     <button
   onClick={exportToPDF}
